@@ -2,9 +2,14 @@ import React, { useState } from 'react'
 import { AiFillEyeInvisible, AiFillEye} from "react-icons/ai"
 import { Link } from 'react-router-dom'
 import OAuth from '../components/OAuth'
-
+import {getAuth, createUserWithEmailAndPassword, updateProfile} from "firebase/auth"
+import { db} from "../firebase"
+import { doc, serverTimestamp, setDoc } from 'firebase/firestore'
+import { useNavigate } from 'react-router-dom'
+import { toast } from 'react-toastify'
 
 const SignUp = () => {
+  const navigate = useNavigate()
   const [showPassword, setShowPassword] = useState(false)
   const [formData, setFormData] = useState({
     name: "",
@@ -19,6 +24,27 @@ function onChange(e) {
   }))
 }
 
+async function onSubmit(e){
+  e.preventDefault()
+  try {
+    const auth = getAuth()
+    const userCredential = await createUserWithEmailAndPassword(auth, email, password)
+
+    updateProfile(auth.currentUser, {
+      displayName: name
+    })
+    const user = userCredential.user
+   const formDataCopy = {...formData}
+   delete formDataCopy.password
+   formDataCopy.timestamp = serverTimestamp()
+
+   await setDoc(doc(db, "users", user.uid), formDataCopy)
+  //  toast.success("Sign up was successfull")
+   navigate("/")
+  } catch (error) {
+    toast.error("Something went wrong with registration")
+  }
+}
   return (
     <section>
       <h1 className='text-3xl text-center mt-6 font-bold'>Sign Up</h1>
@@ -30,11 +56,11 @@ function onChange(e) {
           />
         </div>
         <div className='w-full md:w-[67%] lg:w-[40%] lg:ml-20'>
-          <form>
+          <form onSubmit={onSubmit}>
             <input 
               className='w-full px-4 py-2 text-xl mb-6 text-gray-700 bg-white border-gray-300 rounded transition ease-in-out' 
-              type="texte"
-              id='namel'
+              type="text"
+              id='name'
               value={name}
               onChange={onChange}
               placeholder="Full name"
