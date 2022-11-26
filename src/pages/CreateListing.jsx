@@ -148,13 +148,13 @@ export default function CreateListing() {
     }
 
     const imgUrls = await Promise.all(
-      [...images].map((image) => storeImage(image))
+      [...images].map((image) => storeImage(image)
      .catch((error) => {
       setLoading(false);
       toast.error("Images not uploaded");
       return;
     }
-    ))
+    )))
 
     const formDataCopy = {
       ...formData,
@@ -178,7 +178,7 @@ export default function CreateListing() {
     return <Spinner />;
   }
 
-  
+
   return (
     <main className="max-w-md px-2 mx-auto">
       <h1 className="text-3xl text-center mt-6 font-bold">Create a Listing</h1>
