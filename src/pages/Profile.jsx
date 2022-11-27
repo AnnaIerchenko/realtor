@@ -1,5 +1,5 @@
 import { getAuth, updateProfile } from 'firebase/auth'
-import { doc, updateDoc , collection, query, where, orderBy, getDocs} from 'firebase/firestore'
+import { doc, updateDoc , collection, query, where, orderBy, getDocs, deleteDoc} from 'firebase/firestore'
 import React, { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
@@ -71,6 +71,21 @@ useEffect(() => {
   fetchUserListings()
 }, [auth.currentUser.uid])
 
+async function onDelete(listingID){
+  if(window.confirm("Are you sure you want to delete?")){
+    await deleteDoc(doc(db, "listings", listingID))
+    const updatedListings = listings.filter(
+      (listing) => listing.id !== listingID
+    )
+    setListings(updatedListings)
+    toast.success("Successfully deleted the listings")
+  }
+}
+
+function onEdit(listingID){
+  navigate(`/edit-listing/${listingID}`)
+}
+
   return (
     <>
     <section className='max-w-6xl mx-auto flex justify-center items-center flex-col'>
@@ -130,6 +145,8 @@ useEffect(() => {
                 key={listing.id} 
                 id={listing.id}
                 listing={listing.data}
+                onDelete={()=>onDelete(listing.id)}
+                onEdit={()=>onEdit(listing.id)}
                 />
             ))}
           </ul>
