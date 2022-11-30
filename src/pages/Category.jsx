@@ -100,7 +100,7 @@ const params = useParams()
         )}
         </>
       ) : (
-        <p>There no current offers</p>
+        <p>There no current{" "} {params.categoryName === "rent" ? "places for rent" : "places for sale"}</p>
       )}
     </div>
   )
